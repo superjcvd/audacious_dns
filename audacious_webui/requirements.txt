@@ -1,0 +1,27 @@
+﻿black
+pre-commit
+build
+pytest
+flask
+flask-sqlalchemy
+flask-login
+flask-bcrypt
+flask-migrate
+flask-wtf
+email_validator
+alembic
+
+# Flask-Bootstrap
+# Flask-Cors
+# Flask-JWT
+# Flask-JWT-Simple
+# Flask-Mail
+# Flask-Script
+# Frozen-Flask
+# bcrypt
+# fabric
+# Jinja2
+# SQLAlchemy
+# Werkzeug
+# WTForms
+# Frozen-Flask

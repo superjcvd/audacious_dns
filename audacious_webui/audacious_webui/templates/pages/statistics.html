@@ -1,0 +1,32 @@
+{% from 'includes/paging.html' import build_pagination %}
+<div class="container">
+{% if current_user.is_authenticated %}
+    <section class="section is-medium">
+        <div>
+            <h1 class="title">DNS request statistics</h1>
+
+            <table class="table is-fullwidth is-hoverable">
+                <tr>
+                    <th>Domain ID</th>
+                    <th>Client IP</th>
+                    <th>Num. requests</th>
+                    <th></th>
+                </tr>
+                {% for row in statistics %}
+                <tr>
+                    <td>{{row.domain_name}}</td>
+                    <td>{{row.stats_client_ip}}</td>
+                    <td>{{row.stats_request_count}}</td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div>
+            {{ build_pagination(page, page_number, page_name) }}
+        </div>
+    </section>
+{% else %}
+    <div> Restricted area</div>
+{% endif %}
+</div>

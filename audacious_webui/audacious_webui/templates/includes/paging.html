@@ -1,0 +1,59 @@
+{% macro build_pagination(page, page_number, page_name) %}
+<ul class="pagination-list">
+    <!-- First page -->
+    <li>
+        <a class="pagination-link" href="{{ url_for( page_name, page=1 ) }}" aria-label="First">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">First</span>
+        </a>
+    </li>
+    <!-- previous page -->
+    <li>
+    {% if page|int() > 1 %}
+        <a class="pagination-previous" href="{{ url_for( page_name, page=(page-1) ) }}" aria-label="Previous">
+    {% else %}
+        <a class="pagination-previous" aria-label="Previous" disabled>
+    {% endif %}
+            <span aria-hidden="true">&lsaquo;</span>
+            <span class="sr-only">Previous</span>
+        </a>
+    </li>
+    <!-- all pages -->
+    {% for p in range(page_number) %}
+    {% set list_page = p+1 %}
+        {% if ( page-2 < list_page < page+2 )%}
+            <li>
+            {% if page|int() == list_page|int()%}
+                <a class="pagination-link  is-current" href="{{ url_for( page_name, page=list_page ) }}" aria-label="Page {{list_page}}" aria-current="page">{{list_page}}</a>
+            {% else %}
+                <a class="pagination-link" href="{{ url_for( page_name, page=list_page ) }}" aria-label="Page {{list_page}}">{{list_page}}</a>
+            {% endif %}
+            </li>
+        {% elif p|int() == page_number-1 %}
+            <li>
+                <a class="pagination-link" >...</a>
+            </li>
+        {% else %}
+        {% endif %}
+    {% endfor %}
+    <li>
+    <!-- next page -->
+    {% if page|int() < page_number %}
+        <a class="pagination-link" href="{{ url_for( page_name, page=(page+1) ) }}" aria-label="Next">
+    {% else %}
+        <a class="pagination-link" aria-label="Next" disabled>
+    {% endif %}
+        
+            <span aria-hidden="true">&rsaquo;</span>
+            <span class="sr-only">Next</span>
+        </a>
+    </li>
+    <!-- last page -->
+    <li>
+        <a class="pagination-link" href="{{ url_for( page_name, page=page_number ) }}" aria-label="Last">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Last</span>
+        </a>
+    </li>
+</ul>
+{% endmacro %}

@@ -1,0 +1,52 @@
+version: '3.0'
+
+services:
+  audacious_webui:
+    image: audacious_webui:latest
+    restart: always
+    environment:
+      FLASK_ENV: 'production'
+    volumes:
+      - audacious_database:/var/audacious_dns/database
+    ports:
+      - '8080:8080/tcp'
+    expose:
+      - '8080'
+    networks:
+      - local
+  audacious_core:
+    image: audacious_core:latest
+    restart: always
+    volumes:
+      - audacious_database:/var/audacious_dns/database:ro
+      - ./audacious_nginx/system/etc/letsencrypt/:/etc/letsencrypt/
+    ports:
+      - '53:53/udp'
+      - '5300:5300/tcp'
+      - '853:853/tcp'
+    expose:
+      - '53'
+      - '853'
+    networks:
+      - local
+  audacious_nginx:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./audacious_nginx/system/etc/nginx/sites-enabled/:/etc/nginx/conf.d/
+      - ./audacious_nginx/system/etc/letsencrypt/:/etc/letsencrypt/
+      - ./audacious_nginx/system/var/audacious_dns/:/var/audacious_dns/
+    ports:
+      - '443:443/tcp'
+    expose:
+      - '443'
+    networks:
+      - local
+
+# Names our volume
+volumes:
+  audacious_database:
+
+networks:
+  local:
+    driver: bridge

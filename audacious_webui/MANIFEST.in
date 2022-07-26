@@ -1,0 +1,2 @@
+recursive-include audacious_webui/static *
+recursive-include audacious_webui/templates *

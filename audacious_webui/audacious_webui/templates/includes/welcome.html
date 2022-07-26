@@ -1,0 +1,16 @@
+<div class="hero-body">
+      <p classs="image is-3by1">
+            <img src="/static/img/audacious_blog.png">
+      </p>
+      <p class="title">
+            Welcome 
+            {% if current_user.is_authenticated %}
+            "{{ current_user.name }}"
+            {% else %}
+            "Anonymous"
+            {% endif %}
+      </p>
+      <p class="subtitle">
+            You are on the Homepage
+      </p>
+</div>

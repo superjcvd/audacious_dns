@@ -1,0 +1,171 @@
+{% from 'includes/paging.html' import build_pagination %}
+<div class="container">
+{% if current_user.is_authenticated %}
+    <section class="section is-medium">
+        <h1 class="title">Manage blocked domains</h1>
+        
+        <div class="level-left">
+            <div class="level-item">
+                <a class="button is-primary modal-button"
+                data-target="modal-add-domain">Add domain</a>
+            </div>
+            <div class="level-item">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="notification is-warning column">
+                    <ul class=flashes>
+                        {% for message in messages %}
+                        <li>{{ message }}<li>
+                        {% endfor %}
+                        {% if form.errors %}
+                        <li>{{ form.errors }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            {% endwith %}
+            </div>
+        </div>
+        <div>
+            <table class="table is-fullwidth is-hoverable">
+                <tr>
+                    <th>Domain name</th>
+                    <th>Domain type</th>
+                    <th>Active</th>
+                    <th></th>
+                </tr>
+                {% for row in domains %}
+                <tr>
+                    <td>{{row.domain_name}}</td>
+                    <td>{{row.domain_type}}</td>
+                    <td>{{row.domain_isactive}}</td>
+                    <td>
+                        <a class="button is-light modal-button" 
+                        data-target="modal-edit-domain-{{row.domain_id}}">Edit</a>
+                        <a class="button is-light modal-button" 
+                        data-target="modal-delete-domain-{{row.domain_id}}">Delete</a>
+                    </td>
+
+                    <!-- Modal Edit Domain-->
+                    <td>
+                        <form action="{{ url_for('domains.page_domains_update') }}" method="POST">
+                            {{ form.csrf_token }}
+                            {% if form.csrf_token.errors %}
+                                <div class="warning">You have submitted an invalid CSRF token</div>
+                            {% endif %}
+                            <div id="modal-edit-domain-{{row.domain_id}}" class="modal">
+                                <div class="modal-background"></div>
+                                <div class="modal-card">
+                                    <header class="modal-card-head">
+                                        <p class="modal-card-title">Update Information</p>
+                                        <button class="delete" aria-label="close"></button>
+                                    </header>
+                                    <section class="modal-card-body">
+                                        <input type="hidden"  name="domain_id" value="{{row.domain_id}}">
+                                        <div class="field">
+                                            <label class="label">Domain:</label>
+                                            <div class="control">
+                                                {{ form.domain_name(class="input", value=row.domain_name) }}
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">Type:</label>
+                                            <div class="control">
+                                                {{ form.domain_type(class="input", value=row.domain_type) }}
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <div class="control">
+                                                <label class="checkbox">
+                                                    {{ form.domain_isactive(checked=row.domain_isactive) }}
+                                                    Active filtering
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <div class="modal-card-foot">
+                                        {{ form.domain_edit(class="button is-warning")}}
+                                        <button class="button" type="button" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- Modal Delete Domain-->
+                        <form action="{{ url_for('domains.page_domains_delete') }}" method="POST">
+                            <div id="modal-delete-domain-{{row.domain_id}}" class="modal">
+                                <div class="modal-background"></div>
+                                <div class="modal-card">
+                                    <header class="modal-card-head">
+                                        <p class="modal-card-title">Delete domain</p>
+                                        <button class="delete" aria-label="close"></button>
+                                    </header>
+                                    <section class="modal-card-body">
+                                        <input type="hidden"  name="domain_id" value="{{row.domain_id}}">
+                                        Are you sure to delete domain <b>{{row.domain_name}}</b>?
+                                    </section>
+                                    <div class="modal-card-foot">
+                                        <button class="button is-danger" type="submit">Delete</button>
+                                        <button class="button" type="button" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div>
+            {{ build_pagination(page, page_number, page_name) }}
+        </div>
+    </section>
+    <section class="section is-medium">
+        <!-- Modal Add Domain-->
+        <form action="{{ url_for('domains.page_domains_insert') }}" method="POST">
+            {{ form.csrf_token }}
+            {% if form.csrf_token.errors %}
+                <div class="warning">You have submitted an invalid CSRF token</div>
+            {% endif %}
+            <div id="modal-add-domain" class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title">Add domain</p>
+                        <button class="delete" aria-label="close"></button>
+                    </header>
+                    <section class="modal-card-body">
+                        <div class="field">
+                            <label class="label">Domain</label>
+                            <div class="control">
+                                {{ form.domain_name(class="input", placeholder="e.g www.malwares.com") }}
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Type</label>
+                            <div class="control">
+                                {{ form.domain_type(class="input", placeholder="e.g malwares") }}
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    {{ form.domain_isactive(checked=True) }}
+                                    <!-- <input id="domain_isactive" name="domain_isactive" type="checkbox" value="checked"> -->
+                                    Active filtering
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                        {{ form.domain_add(class="button is-success")}}
+                        <button class="button" data-dismiss="modal">Close</button>
+                    </footer>
+                </div>
+            </div>
+        </form>
+    </section>
+{% else %}
+    <div> Restricted area</div>
+{% endif %}
+</div>
+
