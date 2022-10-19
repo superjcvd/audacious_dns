@@ -7,9 +7,9 @@ flask-login
 flask-bcrypt
 flask-migrate
 flask-wtf
+flask-socketio
 email_validator
 alembic
-
 # Flask-Bootstrap
 # Flask-Cors
 # Flask-JWT

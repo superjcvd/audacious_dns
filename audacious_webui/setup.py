@@ -22,6 +22,7 @@ setup(
         "flask-login",
         "flask-bcrypt",
         "flask-migrate",
+        "flask-socketio",
         "flask-wtf",
         "email_validator",
         "alembic",
