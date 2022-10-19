@@ -3,8 +3,8 @@ source venv/bin/activate
 
 install dev environment
 ```
-pyenv install 3.10.4
-pyenv virtualenv 3.10.4 venv-audacious
+pyenv install 3.10.6
+pyenv virtualenv 3.10.6 venv-audacious-dns
 pyenv virtualenvs
 pyenv activate venv-audacious
 # create a file called .python-version 

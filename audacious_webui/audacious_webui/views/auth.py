@@ -6,6 +6,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    current_app,
     Blueprint,
 )
 
@@ -53,10 +54,10 @@ def signup():
         email = request.form.get("email", "", type=str)
 
         # filter User out of database through username
-        user = Users.query.filter_by(user=username).first()
+        user = current_app.session.query(Users).filter_by(user=username).first()
 
         # filter User out of database through username
-        user_by_email = Users.query.filter_by(email=email).first()
+        user_by_email = current_app.session.query(Users).filter_by(email=email).first()
 
         if user or user_by_email:
             msg = "Error: User exists!"
@@ -64,7 +65,7 @@ def signup():
         else:
             pw_hash = generate_password_hash(password)
             user = Users(username, pw_hash, name, email)
-            user.save()
+            user.save(current_app.session)
 
             success = True
             msg = f"""<div class="notification is-success container">
@@ -104,7 +105,7 @@ def login():
         password = request.form.get("password", "", type=str)
 
         # filter User out of database through username
-        user = Users.query.filter_by(user=username).first()
+        user = current_app.session.query(Users).filter_by(user=username).first()
 
         if user:
             if check_password_hash(user.password, password):

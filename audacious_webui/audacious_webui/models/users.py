@@ -2,10 +2,12 @@
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String
 from audacious_webui.common import DATATYPE
-from audacious_webui.database import db
+# from audacious_webui.database import db
+from audacious_webui.models.base import Base
 
 
-class Users(UserMixin, db.Model):
+class Users(UserMixin, Base):
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     user = Column(String(64), unique=True)
     email = Column(String(120), unique=True)
@@ -27,9 +29,9 @@ class Users(UserMixin, db.Model):
     def __repr__(self):
         return f"<User ({self.id})>"
 
-    def save(self):
+    def save(self, session):
         # inject self into db session
-        db.session.add(self)
+        session.add(self)
         # commit change and save the object
-        db.session.commit()
+        session.commit()
         return self

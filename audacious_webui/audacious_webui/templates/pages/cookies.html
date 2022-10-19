@@ -1,0 +1,70 @@
+{% from 'includes/paging.html' import build_pagination %}
+<div class="container">
+{% if current_user.is_authenticated %}
+    <section class="section is-medium">
+        <h1 class="title">Manage intercepted cookies</h1>
+        
+        <div class="level-left">
+            <div class="level-item">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="notification is-warning column">
+                    <ul class=flashes>
+                        {% for message in messages %}
+                        <li>{{ message }}<li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            {% endwith %}
+            </div>
+        </div>
+        <div>
+            <table class="table is-fullwidth is-hoverable">
+                <tr>
+                    <th>Cookies IP address</th>
+                    <th>Cookies data</th>
+                    <th>Creation Date</th>
+                    <th></th>
+                </tr>
+                {% for row in cookies %}
+                <tr>
+                    <td>{{row.id}}</td>
+                    <td>{{row.ip}}</td>
+                    <td>{{row.cookies}}</td>
+                    <td>{{row.creation}}</td>
+                    <td>
+                        <a class="button is-light modal-button" 
+                        data-target="modal-delete-cookie-{{row.id}}">Delete</a>
+                    </td>
+                        <!-- Modal Delete Cookie-->
+                        <form action="{{ url_for('cookies.cookies_delete') }}" method="POST">
+                            <div id="modal-delete-cookie-{{row.id}}" class="modal">
+                                <div class="modal-background"></div>
+                                <div class="modal-card">
+                                    <header class="modal-card-head">
+                                        <p class="modal-card-title">Delete cookie</p>
+                                        <button class="delete" aria-label="close"></button>
+                                    </header>
+                                    <section class="modal-card-body">
+                                        <input type="hidden"  name="id" value="{{row.id}}">
+                                        Are you sure to delete cookies <b>{{row.id}}</b>?
+                                    </section>
+                                    <div class="modal-card-foot">
+                                        <button class="button is-danger" type="submit">Delete</button>
+                                        <button class="button" type="button" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+{% else %}
+    <div> Restricted area</div>
+{% endif %}
+</div>
+

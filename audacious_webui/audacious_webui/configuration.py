@@ -62,3 +62,15 @@ class DevelopmentConfig(Config):
     DEBUG = False
     TESTING = False
     FORCE_HTTPS = False
+
+
+
+choice = {
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+}
+
+
+def get_config():
+    flask_env = os.environ.get("FLASK_CONFIG")
+    return choice.get(flask_env or "production")

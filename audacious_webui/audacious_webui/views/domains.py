@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 import logging
-from flask import render_template, Blueprint, request, redirect, url_for, flash
+from flask import render_template, Blueprint, request, redirect, url_for, flash, current_app
 from audacious_webui.models.domains import Domains
 from audacious_webui.forms import DomainsForm
 from werkzeug.exceptions import abort
@@ -16,7 +16,7 @@ MAX_PER_PAGE = 10
 @domains.route("/domains/page/<int:page>", methods=["GET"])
 def page_domains(page=1, max_per_page=MAX_PER_PAGE):
     try:
-        num_domains, domains = Domains.db_domains_get_paginate(page, max_per_page)
+        num_domains, domains = Domains.db_domains_get_paginate(current_app.session, page, max_per_page)
         page_number = ceil(num_domains / max_per_page)
 
         LOGGER.info(num_domains)
@@ -60,7 +60,7 @@ def page_domains_insert():
                     f"Trying to add a new domain --> {domain_name}/{domain_type}/{domain_isactive}"
                 )
                 new_domain = Domains(domain_name, domain_type, domain_isactive)
-                new_domain.db_domains_add()
+                new_domain.db_domains_add(current_app.session)
         else:
             flash("incomplete form")
 
@@ -91,6 +91,7 @@ def page_domains_update():
                 f"Trying to edit {domain_id} --> {domain_name} - {domain_type} - {domain_isactive}"
             )
             Domains.db_domains_update(
+                current_app.session,
                 domain_id,
                 {
                     "domain_name": domain_name,
@@ -115,7 +116,7 @@ def page_domains_delete():
         if request.method == "POST":
             domain_id = request.form["domain_id"]
             LOGGER.error(f"DELETE --> domain id {domain_id}")
-            Domains.db_domains_delete_by_id(domain_id)
+            Domains.db_domains_delete_by_id(current_app.session, domain_id)
 
             return redirect(url_for("domains.page_domains"))
         else:

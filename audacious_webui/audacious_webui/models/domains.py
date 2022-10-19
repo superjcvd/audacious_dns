@@ -1,20 +1,23 @@
-# from app.views.domains import LOGGER
-from sqlalchemy.exc import IntegrityError
+
 from flask import Flask, flash
+from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, Unicode, Boolean, func
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import IntegrityError
+from audacious_webui.models.base import Base
 import re
 import logging
-from audacious_webui.database import db
+# from audacious_webui.database import db
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Domains(db.Model):
+class Domains(Base):
     __tablename__ = "domains"
-    domain_id = db.Column(db.Integer, primary_key=True)
-    domain_name = db.Column(db.Unicode(65), nullable=False, index=True, unique=True)
-    domain_type = db.Column(db.Unicode(50), nullable=False)
-    domain_isactive = db.Column(db.Boolean, default=True)
-    domain_stats = db.relationship(
+    domain_id = Column(Integer, primary_key=True)
+    domain_name = Column(Unicode(65), nullable=False, index=True, unique=True)
+    domain_type = Column(Unicode(50), nullable=False)
+    domain_isactive = Column(Boolean, default=True)
+    domain_stats = relationship(
         "Statistics", backref="domains", lazy=True, cascade="all, delete-orphan"
     )
 
@@ -39,45 +42,45 @@ class Domains(db.Model):
         self.domain_type = str(domain_type)
         self.domain_isactive = bool(domain_isactive)
 
-    def db_domains_add(self):
+    def db_domains_add(self, session):
         try:
-            db.session.add(self)
-            db.session.commit()
+            session.add(self)
+            session.commit()
             return self
         except IntegrityError:
             flash("Duplicate entry!")
             return None
             pass
 
-    def db_domains_get_all():
-        return db.session.query(Domains).all()
+    def db_domains_get_all(session):
+        return session.query(Domains).all()
 
-    def db_domains_get_paginate(page_number, max_per_page):
-        num_domains = int(db.session.query(Domains).count())
+    def db_domains_get_paginate(session, page_number, max_per_page):
+        num_domains = int(session.query(Domains).count())
         domains = (
-            db.session.query(Domains)
+            session.query(Domains)
             .offset((page_number - 1) * max_per_page)
             .limit(max_per_page)
             .all()
         )
         return num_domains, domains
 
-    def db_domains_get_by_name(domain_name):
-        return db.session.query(Domains).filter_by(domain_name=domain_name).first()
+    def db_domains_get_by_name(session, domain_name):
+        return session.query(Domains).filter_by(domain_name=domain_name).first()
 
-    def db_domains_get_by_id(domain_id):
-        return db.session.query(Domains).get(domain_id)
+    def db_domains_get_by_id(session, domain_id):
+        return session.query(Domains).get(domain_id)
 
     @classmethod
-    def db_domains_update(cls, domain_id, domain_dict):
+    def db_domains_update(cls, session, domain_id, domain_dict):
         try:
             # if 'domain_name' in domain_dict and not cls.validate_domain_name(domain_dict['domain_name']):
             #     raise ValueError("not a domain!")
             # if 'domain_type' in domain_dict and not cls.validate_domain_type(domain_dict['domain_type']):
             #     raise ValueError("not a valid domain type!")
 
-            db.session.query(Domains).filter_by(domain_id=domain_id).update(domain_dict)
-            db.session.commit()
+            session.query(Domains).filter_by(domain_id=domain_id).update(domain_dict)
+            session.commit()
 
         except ValueError as e:
             LOGGER.error(e)
@@ -87,10 +90,10 @@ class Domains(db.Model):
             pass
 
     @classmethod
-    def db_domains_delete_by_id(cls, domain_id):
-        domain_to_delete = db.session.query(Domains).get(domain_id)
-        db.session.delete(domain_to_delete)
-        db.session.commit()
+    def db_domains_delete_by_id(cls, session, domain_id):
+        domain_to_delete = session.query(Domains).get(domain_id)
+        session.delete(domain_to_delete)
+        session.commit()
 
     @staticmethod
     def validate_domain_name(domain_name):
@@ -116,7 +119,7 @@ def main():
 
     print(Domains.db_domains_get_all())
 
-    db.session.close()
+    # session.close()
 
 
 if __name__ == "__main__":
